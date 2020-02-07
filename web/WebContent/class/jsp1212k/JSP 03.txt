@@ -1,0 +1,258 @@
+[JSP 03]
+
+1.OUT 내장 객체 
+
+	: 웹 브라우저에 데이터를 전송하는 출력 스트림 객체 
+	   <%=  %> 와 동일한 결과가 나옴
+
+	1) 메서드
+		void print(String str)		: 브라우저에 출력 
+		void println(String str) 	: 브라우저에 출력. 줄바꿈 적용 X
+
+2. APPLICATION 내장 객체
+	
+	: 어플리케이션과 관련된 기본 객체 
+	특정한 웹 어플리케이션에 포함된 모든 JSP 페이지는 하나의 APPLICATION 내부객체를 공유한다.
+	초기 설정 정보 읽기, 서버 정보 읽기, 웹 어플리케이션이 제공하는 자원 읽기
+	
+	1) 웹 어플리케이션 초기화 파라미터 읽기
+	
+		웹 어플리케이션 전체에 사용 할 수 있는 초기화 파라미터는 
+		WEB-INF/WEB.XML 파일에 <context-param> 태그를 사용하여 추가한다
+	
+		* web.xml
+			: 웹 어플리케이션을 위한 설정 정보를 담고 있는 파일
+			WEB-INF 폴더 안에 위치해야함 
+
+		<context-param> 
+			<description>파라미터 설명글(필수아님)</description> 
+			<param-name>파라미터 이름</param-name>
+			<param-value>파라미터 값</param-value>
+		</context-param> 
+		
+
+		web.xml 파일에 초기화 파라미터를 추가하면,
+		JSP 는 APPLICATION 내부객체가 제공하는 메서드를 이용하여 초기화 파라미터를 사용 할 수 있다.
+		
+		# 초기화 파라미터 읽는 메서드
+
+		String getInitParameter(String name) 
+			: 파라미터 이름이 name 인 웹 어플리케이션 초기화 파라미터 값을 읽어옴.
+			없으면 null 
+
+		Enumeration            getInitParameterNames()		
+			: 초기화 파라미터의 이름 목록 리턴
+
+
+3. 에러페이지 셋팅
+
+	웹 어플리케이션 실행 도중에 발생 할 수 있는 오류에 대비한 예외처리 코드를 작성하여
+	비 정상적인 종료를 막기 위한 세팅
+		
+	1) 웹 에러
+
+	개발자의 실수로 일어날 수 있는 웹 에러 두개
+	404 : Not Found : 요청 경로 오류
+	500 : Internal Server Error : 요청 페이지의 로직 오류 (자바 문법 오류)
+
+	그 외 http 상태 코드 
+	[2xx] Success 성공 관련 코드
+	200: 성공 : 서버가 요청한 페이지를 잘 처리하여 제공 했다
+	[3xx] Redirection 이동 관련 코드
+	[4xx] Client Error 관련 코드
+	400: Bad request : 요청 이상함 . 입력란에 이상한 데이터나 JSON 이 와야하는데 엉뚱한게 온 경우다
+	405 : Method Not Allowed 해당 메서드 안될떄 허용되지 않음 요청에 지정된 방법 사용 할 수 없다
+	[5xx] Sever Error 관련 코드
+	503: Service Unavailable : 서비스 지원 불가 
+	
+
+	2) 예외처리 방법
+
+		- try - catch - finally 를 이용한 예외 처리 : 자바로 처리
+		- page 디렉티브 태그 이용한 예외 처리 : errorPage속성, isErrorPage 속성
+		- web.xml 파일을 이용한 예외 처리 : <error-page> 태그와 하위 태그 이용 
+		
+		동시 적용시 예외 처리 우선순위
+		1. try-catch-finally 
+		2. page 디렉티브 태그
+		3. web.xml 예외 유형 
+		4.  web.xml 오류 코드
+		5. 위 항목에 해당 안되면 웹서버에서 제공하는 기본 오류 페이지 출력 
+
+	3) web.xml 파일을 이용한 예외처리 
+	
+		<error-page> 
+			<error-code> ....</error-code> 또는 <exception-type> .....</exception-type> 
+			<location> ... </location>   // 발생하면 처리할 페이지를 location 으로 설정 함 
+		</error-page> 
+	
+		error-cod : 오류 코드 설정하는데 사용 
+		exception-type : 자바 예외 유형의 정규화된 클래스 이름 설정 
+		location : 에러페이지의 URL 설정 
+
+4. 액션태그
+	: 서버나 클라이언트에게 어떤 행등을 하도록 명령하는 명령태그
+	페이지와 페이지 사이를 제어 할떄 사용
+	자바를 태그로 만들어 놓은 것 
+
+	태그 정리
+	-<html>
+	-<스크립트 태그> : 선언문<%!  /스트립트릿 <% / 출력문  <%= 
+	-주석  <%-- --%>
+	- 디렉티브 태그 : <%@ page / include / taglib 
+	- 액션태그 : <jsp : .... 
+
+	1) 액션 태그종류 	
+		forward		: 다른 페이지로 이동(흐름 제어)
+		include		: 외부 페이지 내용 포함, 페이지 모듈화	
+		useBean		: 자바 빈즈 설정 
+		setProperty	: 자바 빈즈의 property 값 설정 
+		getProperty 	: 자바 빈즈의 property 값 가져오기 
+		param		: forward , include, plugin 액션 태그에 인자를 추가 할떄 
+		
+		element		: 동적 xml 요소 설정 
+		attribute		: 동적 정의된 xml 요소의 속성 설정 
+		body		: 동적 정의된 xml 요소의 몸체 설정
+		text 		: jsp 페이지 및 문서에서 탬플릿 텍스트 작성 
+
+
+5. forward 액션태그
+	: 다른 페이지로 이동 
+	
+	<jsp: forward page= "파일 경로 " /> 
+	<jsp: forward page= "파일 경로 " />  </jsp:forward> 
+
+	파일 경로 : 이동할 페이지의 파일 명 또는 URL 로 설정 
+
+	1) forward vs sendRedirect 
+	
+		sendRedirect()   : 데이터 없이 단순 이동 . 주소창에 URL 주소가 도착 페이지 주소임 
+		forward                  : 데이터를 가지고 이동 . 일반적으로 많이 사용, 주소가 도착페이지 주소가 아님
+		
+6. include 액션 태그
+	
+	:  include 디렉티브 태그처럼 외부 파일 내용을 포함 시키는 태그
+
+	<jsp: include page ="파일 경로" flush= "false"/> 
+	
+	파일 경로 : 포함시킬 외부 파일명 또는 URL 설정
+	flush            : 기본값 false, false 로 지정하는 것이 좋다 ! 
+
+	include 디렉티브 태그 : 단순 코드 복사 	<%@ include : 인코딩 설정 주의 !!!
+			        처리 시간               : 번역 시 자원 포함
+			         기능                         : 현재 페이지에 삽입
+			 데이터 전달 방법      : 페이지 내의 변수 선언 후 값 저장
+			         용도                         : 다수의 JSP 페이지에서 공통으로 사용되는 코드
+			                                               저작권 같은 문장을 포함하는 경우 사용 
+				정적 페이지에 사용  
+			         
+	
+	include 액션 태그            : 외부 파일 실행 된 후 현재 JSP 페이지로 제어를 변환시킴 
+			         외부 파일 처리 결과 내용 포함 
+
+			처리기간 : 요청시 자원 포함
+			기능 : 별도의 파일로 요청 , 처리 흐름을 이동
+			데이터 전달 방법 : REQUEST 내장객체나, PARAM 액션태그를 이동하여 전달 
+			용도 : 화면 레이아웃 일부분을 모듈화 활때 주로 사용
+	
+			동적 페이지에 사용 
+	
+7. PARAM 액션 태그
+
+	: 다른 페이지에 정보를 전달 하는 태그
+	단독으로 사용 불가.< jsp: forward> 나 <jsp:include> 태그 내부에서 사용됨
+	전송할 값의 개수만큼 param 태그 사용
+	
+	<jsp:forward page="파일경로"> 
+		<jsp:param name ="파라미터명" value ="전달 할 값" /> 
+		<jsp:param name ="파라미터명" value ="전달 할 값" />  ** 보내고 싶은 갯수만큼 태그를 작성 하면 된다
+	</jsp:forward page> 
+
+	웹에서 파라미터가 전달되는형태 : 문자형태 무조건 !! String 타입 
+
+	* <jsp:param> 액션태그는 파라미터를 이용해서 데이터를 추가하기 때문에
+	String 타입의 값만 전달 할 수 있다(제약)
+	날짜, 숫자, 객체 타입을 전달 시, 값을 문자열로 변환해야하고,
+	반대로 문자열을 알맞은 타입으로 변환해주는 기능도 구현해야 한다.
+	-> 기본 객체의 속성을 이용 
+
+	* 속성(Attribute) 을 공유할 수 있는 유효 범위
+		: 내장객체가 존재하는 동안 사용 할 수 있는 속성의 영역
+
+	영역                                      내장객체                                                유효범위
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+	page		pageContext 		해당 페이지가 클라이언트에게 서비스를 제공하는 동안 유효
+	request*		request			클라이언트 요청이 처리되는 동안 유효 
+	session*		session			세션이 유지되는 동안 유효		
+	application	application		웹 어플리케이션이 실행되고 있는 동안 유효 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
