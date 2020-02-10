@@ -104,7 +104,7 @@
   	
   	<!-- ======================EL TEST========================================================== -->
   	
-  	<servlet>
+<!--   	<servlet>
   		<servlet-name>eltest</servlet-name>
   		<servlet-class>web.jsp0207.mvc.TestController</servlet-class>
   	</servlet>
@@ -112,8 +112,17 @@
   	<servlet-mapping>
   		<servlet-name>eltest</servlet-name>
   		<url-pattern>/test.do</url-pattern>
-  	</servlet-mapping> 
+  	</servlet-mapping>  -->
   	
+  	<servlet>
+  		<servlet-name>jstltest</servlet-name>
+  		<servlet-class>web.jsp0210.mvc.TestController1</servlet-class>
+  	</servlet>
+  	
+  	<servlet-mapping>
+  		<servlet-name>jstltest</servlet-name>
+  		<url-pattern>/test1.do</url-pattern>
+  	</servlet-mapping> 
   	
   	
   	
