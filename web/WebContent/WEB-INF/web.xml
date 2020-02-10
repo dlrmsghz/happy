@@ -112,7 +112,8 @@
   	<servlet-mapping>
   		<servlet-name>eltest</servlet-name>
   		<url-pattern>/test.do</url-pattern>
-  	</servlet-mapping>
+  	</servlet-mapping> 
+  	
   	
   	
   	
